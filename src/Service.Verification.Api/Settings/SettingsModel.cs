@@ -14,7 +14,7 @@ namespace Service.Verification.Api.Settings
         [YamlProperty("VerificationApi.ElkLogs")]
         public LogElkSettings ElkLogs { get; set; }
 
-        [YamlProperty("WalletApi.AuthMyNoSqlReaderHostPort")]
+        [YamlProperty("VerificationApi.AuthMyNoSqlReaderHostPort")]
         public string AuthMyNoSqlReaderHostPort { get; set; }
     }
 }
