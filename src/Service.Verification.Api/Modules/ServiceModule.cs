@@ -13,6 +13,7 @@ namespace Service.Verification.Api.Modules
         protected override void Load(ContainerBuilder builder)
         {
 
+            VerificationCodes.Client.AutofacHelper.RegisterVerificationCodesClient(builder, Program.Settings.VerificationCodesGrpcUrl);
 
             RegisterAuthServices(builder);
         }

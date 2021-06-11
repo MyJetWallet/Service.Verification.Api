@@ -16,5 +16,8 @@ namespace Service.Verification.Api.Settings
 
         [YamlProperty("VerificationApi.AuthMyNoSqlReaderHostPort")]
         public string AuthMyNoSqlReaderHostPort { get; set; }
+
+        [YamlProperty("VerificationApi.VerificationCodesGrpcUrl")]
+        public string VerificationCodesGrpcUrl { get; set; }
     }
 }
