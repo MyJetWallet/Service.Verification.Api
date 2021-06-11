@@ -34,4 +34,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\Contracts" />
+  </ItemGroup>
+
 </Project>
