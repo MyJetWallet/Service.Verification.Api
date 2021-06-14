@@ -11,7 +11,7 @@ namespace Service.Verification.Api.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("/api/v1/verification/email")]
+    [Route("/api/v1/email-verification")]
     public class EmailVerificationController : Controller
     {
         private readonly IEmailVerificationCodes _emailVerificationService;
@@ -22,29 +22,29 @@ namespace Service.Verification.Api.Controllers
         }
 
         [HttpPost("request")]
-        public async Task<Response> RequestEmailVerificationCodeAsync([FromBody] string lang)
+        public async Task<Response> RequestEmailVerificationCodeAsync([FromBody] SendVerificationEmailRequest request)
         {
-            var request = new SendVerificationCodeRequest
+            var sendRequest = new SendVerificationCodeRequest
             {
-                Lang = lang,
+                Lang = request.Language,
                 ClientId = this.GetClientIdentity().ClientId
             };
-            var response = await _emailVerificationService.SendEmailVerificationCodeAsync(request);
+            var response = await _emailVerificationService.SendEmailVerificationCodeAsync(sendRequest);
             return response.IsSuccess
                 ? Contracts.Response.OK()
                 : throw new VerificationApiErrorException(response.ErrorMessage, ApiResponseCodes.UnsuccessfulSend);
         }
         
         [HttpPost("verify")]
-        public async Task<Response> VerifyEmailCodeAsync([FromBody] string code, [FromServices] IHttpContextAccessor accessor)
+        public async Task<Response> VerifyEmailCodeAsync([FromBody] VerifyEmailCodeRequest request, [FromServices] IHttpContextAccessor accessor)
         {
-            var request = new VerifyCodeRequest()
+            var verifyRequest = new VerifyCodeRequest()
             {
                 ClientId = this.GetClientIdentity().ClientId,
-                Code = code,
+                Code = request.Code,
                 ClientIp = accessor.HttpContext.GetIp()
             };
-            var response = await _emailVerificationService.VerifyEmailCodeAsync(request);
+            var response = await _emailVerificationService.VerifyEmailCodeAsync(verifyRequest);
             return response.CodeIsValid 
                 ? Contracts.Response.OK() 
                 : throw new VerificationApiErrorException("Invalid verification code", ApiResponseCodes.InvalidCode);
