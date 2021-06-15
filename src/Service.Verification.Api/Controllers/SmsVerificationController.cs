@@ -12,32 +12,32 @@ namespace Service.Verification.Api.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("/api/v1/email-verification")]
-    public class EmailVerificationController : Controller
+    [Route("/api/v1/sms-verification")]
+    public class SmsVerificationController : Controller
     {
-        private readonly IEmailVerificationCodes _emailVerificationService;
+        private readonly ISmsVerificationCodes _smsVerificationService;
 
-        public EmailVerificationController(IEmailVerificationCodes emailVerificationService)
+        public SmsVerificationController(ISmsVerificationCodes smsVerificationService)
         {
-            _emailVerificationService = emailVerificationService;
+            _smsVerificationService = smsVerificationService;
         }
 
         [HttpPost("request")]
-        public async Task<Response> RequestEmailVerificationCodeAsync([FromBody] SendVerificationRequest request)
+        public async Task<Response> RequestSmsVerificationCodeAsync([FromBody] SendVerificationRequest request)
         {
             var sendRequest = new SendVerificationCodeRequest
             {
                 Lang = request.Language,
                 ClientId = this.GetClientIdentity().ClientId
             };
-            var response = await _emailVerificationService.SendEmailVerificationCodeAsync(sendRequest);
+            var response = await _smsVerificationService.SendSmsVerificationCodeAsync(sendRequest);
             return response.IsSuccess
                 ? Contracts.Response.OK()
                 : throw new VerificationApiErrorException(response.ErrorMessage, ApiResponseCodes.UnsuccessfulSend);
         }
         
         [HttpPost("verify")]
-        public async Task<Response> VerifyEmailCodeAsync([FromBody] VerifyCodeRequest request, [FromServices] IHttpContextAccessor accessor)
+        public async Task<Response> VerifySmsCodeAsync([FromBody] VerifyCodeRequest request, [FromServices] IHttpContextAccessor accessor)
         {
             var verifyRequest = new VerificationCodes.Grpc.Models.VerifyCodeRequest()
             {
@@ -45,7 +45,7 @@ namespace Service.Verification.Api.Controllers
                 Code = request.Code,
                 ClientIp = accessor.HttpContext.GetIp()
             };
-            var response = await _emailVerificationService.VerifyEmailCodeAsync(verifyRequest);
+            var response = await _smsVerificationService.VerifySmsCodeAsync(verifyRequest);
             return response.CodeIsValid 
                 ? Contracts.Response.OK() 
                 : throw new VerificationApiErrorException("Invalid verification code", ApiResponseCodes.InvalidCode);
