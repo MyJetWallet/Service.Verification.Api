@@ -23,7 +23,7 @@ namespace Service.Verification.Api.Controllers
         }
 
         [HttpPost("request")]
-        public async Task<Response> RequestEmailVerificationCodeAsync([FromBody] SendVerificationRequest request)
+        public async Task<Response<string>> RequestEmailVerificationCodeAsync([FromBody] SendVerificationRequest request)
         {
             var sendRequest = new SendVerificationCodeRequest
             {
@@ -31,9 +31,13 @@ namespace Service.Verification.Api.Controllers
                 ClientId = this.GetClientIdentity().ClientId
             };
             var response = await _emailVerificationService.SendEmailVerificationCodeAsync(sendRequest);
-            return response.IsSuccess
-                ? Contracts.Response.OK()
-                : throw new VerificationApiErrorException(response.ErrorMessage, ApiResponseCodes.UnsuccessfulSend);
+            return response.IsSuccess 
+                ? new Response<string>(ApiResponseCodes.OK)
+                : new Response<string>(ApiResponseCodes.InvalidCode)
+                {
+                    Data = response.ErrorMessage
+                };
+            
         }
         
         [HttpPost("verify")]
@@ -47,8 +51,8 @@ namespace Service.Verification.Api.Controllers
             };
             var response = await _emailVerificationService.VerifyEmailCodeAsync(verifyRequest);
             return response.CodeIsValid 
-                ? Contracts.Response.OK() 
-                : throw new VerificationApiErrorException("Invalid verification code", ApiResponseCodes.InvalidCode);
+                ? Contracts.Response.OK()
+                : new Response(ApiResponseCodes.InvalidCode);
         }
     }
 }
