@@ -33,7 +33,7 @@ namespace Service.Verification.Api.Controllers
             var response = await _smsVerificationService.SendSmsVerificationCodeAsync(sendRequest);
             return response.IsSuccess
                 ? Contracts.Response.OK()
-                : throw new VerificationApiErrorException(response.ErrorMessage, ApiResponseCodes.UnsuccessfulSend);
+                : new Response(ApiResponseCodes.UnsuccessfulSend);
         }
         
         [HttpPost("verify")]
@@ -47,8 +47,8 @@ namespace Service.Verification.Api.Controllers
             };
             var response = await _smsVerificationService.VerifySmsCodeAsync(verifyRequest);
             return response.CodeIsValid 
-                ? Contracts.Response.OK() 
-                : throw new VerificationApiErrorException("Invalid verification code", ApiResponseCodes.InvalidCode);
+                ? Contracts.Response.OK()
+                : new Response(ApiResponseCodes.InvalidCode);
         }
     }
 }

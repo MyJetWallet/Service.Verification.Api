@@ -33,7 +33,7 @@ namespace Service.Verification.Api.Controllers
             var response = await _emailVerificationService.SendEmailVerificationCodeAsync(sendRequest);
             return response.IsSuccess 
                 ? new Response<string>(ApiResponseCodes.OK)
-                : new Response<string>(ApiResponseCodes.InvalidCode)
+                : new Response<string>(ApiResponseCodes.UnsuccessfulSend)
                 {
                     Data = response.ErrorMessage
                 };
