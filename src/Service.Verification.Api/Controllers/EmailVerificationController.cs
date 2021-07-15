@@ -24,7 +24,7 @@ namespace Service.Verification.Api.Controllers
         }
 
         [HttpPost("request")]
-        public async Task<Response<string>> RequestEmailVerificationCodeAsync([FromBody] SendVerificationRequest request)
+        public async Task<Response> RequestEmailVerificationCodeAsync([FromBody] SendVerificationRequest request)
         {
             var sendRequest = new SendVerificationCodeRequest
             {
@@ -35,12 +35,8 @@ namespace Service.Verification.Api.Controllers
             };
             var response = await _emailVerificationService.SendEmailVerificationCodeAsync(sendRequest);
             return response.IsSuccess 
-                ? new Response<string>(ApiResponseCodes.OK)
-                : new Response<string>(ApiResponseCodes.UnsuccessfulSend)
-                {
-                    Data = response.ErrorMessage
-                };
-            
+                ? Contracts.Response.OK()
+                : new Response(ApiResponseCodes.UnsuccessfulSend);
         }
         
         [HttpPost("verify")]
