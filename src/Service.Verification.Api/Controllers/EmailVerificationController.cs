@@ -7,6 +7,7 @@ using MyJetWallet.Sdk.Authorization.Http;
 using Service.Verification.Api.Controllers.Contracts;
 using Service.VerificationCodes.Grpc;
 using Service.VerificationCodes.Grpc.Models;
+using SimpleTrading.PersonalData.Abstractions.Auth.Consts;
 using VerifyCodeRequest = Service.Verification.Api.Controllers.Contracts.VerifyCodeRequest;
 
 namespace Service.Verification.Api.Controllers
@@ -26,10 +27,14 @@ namespace Service.Verification.Api.Controllers
         [HttpPost("request")]
         public async Task<Response> RequestEmailVerificationCodeAsync([FromBody] SendVerificationRequest request)
         {
+            var clientId = this.GetClientIdentity().ClientId;
+            if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
+                return Contracts.Response.OK();
+            
             var sendRequest = new SendVerificationCodeRequest
             {
                 Lang = request.Language,
-                ClientId = this.GetClientIdentity().ClientId,
+                ClientId = clientId,
                 Brand = this.GetBrandId(),
                 DeviceType = request.DeviceType
             };
