@@ -36,8 +36,6 @@ namespace Service.Verification.Api.Controllers
                 Lang = request.Language,
                 ClientId = clientId,
                 OperationId = request.OperationId,
-                Brand = this.GetBrandId(),
-                DeviceType = request.DeviceType,
                 AssetSymbol = request.AssetSymbol,
                 Amount = request.Amount,
                 DestinationAddress = request.DestinationAddress,
@@ -50,18 +48,17 @@ namespace Service.Verification.Api.Controllers
         }
         
         [HttpGet("verify")]
-        public async Task<Response> VerifyWithdrawalCodeAsync([FromQuery] string withdrawalProcessId, string code, [FromServices] IHttpContextAccessor accessor)
+        public async Task<ActionResult> VerifyWithdrawalCodeAsync([FromQuery] string withdrawalProcessId, string code, [FromServices] IHttpContextAccessor accessor)
         {
-            var verifyRequest = new VerificationCodes.Grpc.Models.VerifyWithdrawalCodeRequest()
+            var verifyRequest = new VerifyWithdrawalCodeRequest()
             {
                 WithdrawalProcessId = withdrawalProcessId,
                 Code = code,
-                ClientIp = accessor.HttpContext.GetIp()
+                ClientIp = accessor.HttpContext.GetIp(),
+                Brand = this.GetBrandId()
             };
             var response = await _withdrawalVerificationService.VerifyWithdrawalCodeAsync(verifyRequest);
-            return response.CodeIsValid 
-                ? Contracts.Response.OK()
-                : new Response(ApiResponseCodes.InvalidCode);
+            return Redirect(response.RedirectLink);
         }
     }
 }
