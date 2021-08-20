@@ -39,7 +39,8 @@ namespace Service.Verification.Api.Controllers
                 AssetSymbol = request.AssetSymbol,
                 Amount = request.Amount,
                 DestinationAddress = request.DestinationAddress,
-                IpAddress = accessor.HttpContext.GetIp()
+                IpAddress = accessor.HttpContext.GetIp(),
+                Brand = this.GetBrandId()
             };
             var response = await _withdrawalVerificationService.SendWithdrawalVerificationCodeAsync(sendRequest);
             return response.IsSuccess 
@@ -49,14 +50,14 @@ namespace Service.Verification.Api.Controllers
         
         [AllowAnonymous]
         [HttpGet("verify")]
-        public async Task<ActionResult> VerifyWithdrawalCodeAsync([FromQuery] string withdrawalProcessId, string code, [FromServices] IHttpContextAccessor accessor)
+        public async Task<ActionResult> VerifyWithdrawalCodeAsync([FromQuery] string withdrawalProcessId, string code, string brand, [FromServices] IHttpContextAccessor accessor)
         {
             var verifyRequest = new VerifyWithdrawalCodeRequest()
             {
                 WithdrawalProcessId = withdrawalProcessId,
                 Code = code,
                 ClientIp = accessor.HttpContext.GetIp(),
-                Brand = this.GetBrandId()
+                Brand = brand
             };
             var response = await _withdrawalVerificationService.VerifyWithdrawalCodeAsync(verifyRequest);
             return Redirect(response.RedirectLink);
