@@ -47,6 +47,7 @@ namespace Service.Verification.Api.Controllers
                 : new Response(ApiResponseCodes.UnsuccessfulSend);
         }
         
+        [AllowAnonymous]
         [HttpGet("verify")]
         public async Task<ActionResult> VerifyWithdrawalCodeAsync([FromQuery] string withdrawalProcessId, string code, [FromServices] IHttpContextAccessor accessor)
         {
