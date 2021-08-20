@@ -39,9 +39,8 @@ namespace Service.Verification.Api.Controllers
                 AssetSymbol = request.AssetSymbol,
                 Amount = request.Amount,
                 DestinationAddress = request.DestinationAddress,
-                IpAddress = accessor.HttpContext.GetIp(),
-                Brand = this.GetBrandId()
-            };
+                IpAddress = accessor.HttpContext.GetIp()
+            }; 
             var response = await _withdrawalVerificationService.SendWithdrawalVerificationCodeAsync(sendRequest);
             return response.IsSuccess 
                 ? Contracts.Response.OK()
