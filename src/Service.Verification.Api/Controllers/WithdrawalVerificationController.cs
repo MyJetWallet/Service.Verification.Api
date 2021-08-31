@@ -39,7 +39,9 @@ namespace Service.Verification.Api.Controllers
                 AssetSymbol = request.AssetSymbol,
                 Amount = request.Amount,
                 DestinationAddress = request.DestinationAddress,
-                IpAddress = accessor.HttpContext.GetIp()
+                IpAddress = accessor.HttpContext.GetIp(),
+                FeeAmount = request.FeeAmount,
+                FeeAssetSymbol = request.FeeAssetSymbol
             }; 
             var response = await _withdrawalVerificationService.SendWithdrawalVerificationCodeAsync(sendRequest);
             return response.IsSuccess 

@@ -12,5 +12,9 @@ namespace Service.Verification.Api.Controllers.Contracts
 
         public string DestinationAddress { get; set; }
         
+        public string FeeAssetSymbol { get; set; }
+
+        public string FeeAmount { get; set; }
+        
     }
 }
