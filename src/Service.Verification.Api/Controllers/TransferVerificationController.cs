@@ -46,11 +46,11 @@ namespace Service.Verification.Api.Controllers
         
         [AllowAnonymous]
         [HttpGet("verify")]
-        public async Task<ActionResult> VerifyWithdrawalCodeAsync([FromQuery] string transferId, string code, string brand, [FromServices] IHttpContextAccessor accessor)
+        public async Task<ActionResult> VerifyWithdrawalCodeAsync([FromQuery] string transferProcessId, string code, string brand, [FromServices] IHttpContextAccessor accessor)
         {
             var verifyRequest = new VerifyTransferCodeRequest()
             {
-                TransferId = transferId,
+                TransferId = transferProcessId,
                 Code = code,
                 ClientIp = accessor.HttpContext.GetIp(),
                 Brand = brand
