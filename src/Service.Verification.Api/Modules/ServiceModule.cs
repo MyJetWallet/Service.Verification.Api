@@ -6,6 +6,7 @@ using MyJetWallet.Sdk.Authorization.NoSql;
 using MyJetWallet.Sdk.NoSql;
 using MyJetWallet.Sdk.Service;
 using MyNoSqlServer.DataReader;
+using Service.ClientProfile.Client;
 
 namespace Service.Verification.Api.Modules
 {
@@ -17,7 +18,10 @@ namespace Service.Verification.Api.Modules
             builder.RegisterType<HttpContextAccessor>().As<IHttpContextAccessor>().SingleInstance();
             
             VerificationCodes.Client.AutofacHelper.RegisterVerificationCodesClient(builder, Program.Settings.VerificationCodesGrpcUrl);
-
+            
+            var noSqlClient = builder.CreateNoSqlClient(Program.ReloadedSettings(e => e.MyNoSqlReaderHostPort));
+            builder.RegisterClientProfileClients(noSqlClient, Program.Settings.ClientProfileGrpcServiceUrl);
+            
             RegisterAuthServices(builder);
         }
 

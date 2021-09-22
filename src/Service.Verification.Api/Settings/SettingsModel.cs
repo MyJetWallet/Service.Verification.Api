@@ -19,5 +19,11 @@ namespace Service.Verification.Api.Settings
 
         [YamlProperty("VerificationApi.VerificationCodesGrpcUrl")]
         public string VerificationCodesGrpcUrl { get; set; }
+        
+        [YamlProperty("VerificationApi.ClientProfileGrpcServiceUrl")]
+        public string ClientProfileGrpcServiceUrl { get; set; }
+        
+        [YamlProperty("VerificationApi.MyNoSqlReaderHostPort")]
+        public string MyNoSqlReaderHostPort { get; set; }
     }
 }
