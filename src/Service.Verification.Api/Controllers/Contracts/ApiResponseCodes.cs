@@ -9,5 +9,6 @@ namespace Service.Verification.Api.Controllers.Contracts
         InternalServerError = 1,
         InvalidCode = 2,
         UnsuccessfulSend = 3,
+        PhoneIsNotConfirmed = 4,
     }
 }

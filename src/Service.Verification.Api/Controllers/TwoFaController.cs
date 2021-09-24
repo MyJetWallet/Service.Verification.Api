@@ -79,9 +79,11 @@ namespace Service.Verification.Api.Controllers
                 Brand = this.GetBrandId()
             };
             var response = await _twoFaVerificationCodes.Send2FaChangeCodeAsync(sendRequest);
-            return response.IsSuccess 
+            return response.IsSuccess
                 ? Contracts.Response.OK()
-                : new Response(ApiResponseCodes.UnsuccessfulSend);
+                : response.ErrorMessage.Contains("Phone number is not confirmed")
+                    ? new Response(ApiResponseCodes.PhoneIsNotConfirmed)
+                    : new Response(ApiResponseCodes.UnsuccessfulSend);
         }
         
         [HttpPost("verify-enable")]
