@@ -10,5 +10,7 @@ namespace Service.Verification.Api.Controllers.Contracts
         InvalidCode = 2,
         UnsuccessfulSend = 3,
         PhoneIsNotConfirmed = 4,
+        OperationNotAllowed = 5,
+        PhoneNotFound = 6,
     }
 }
