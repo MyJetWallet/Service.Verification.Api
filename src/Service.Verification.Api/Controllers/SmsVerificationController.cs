@@ -44,6 +44,10 @@ namespace Service.Verification.Api.Controllers
         [HttpPost("verify")]
         public async Task<Response> VerifySmsCodeAsync([FromBody] VerifyCodeRequest request, [FromServices] IHttpContextAccessor accessor)
         {
+            var clientId = this.GetClientIdentity().ClientId;
+            if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
+                return new Response(ApiResponseCodes.InvalidCode);
+            
             var verifyRequest = new VerificationCodes.Grpc.Models.VerifyCodeRequest()
             {
                 ClientId = this.GetClientIdentity().ClientId,
