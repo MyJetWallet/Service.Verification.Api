@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Service.Verification.Api.Controllers.Contracts;
 using Service.VerificationCodes.Grpc;
 using Service.VerificationCodes.Grpc.Models;
+using SimpleTrading.PersonalData.Abstractions.Auth.Consts;
 using VerifyCodeRequest = Service.Verification.Api.Controllers.Contracts.VerifyCodeRequest;
 
 namespace Service.Verification.Api.Controllers
@@ -25,6 +26,10 @@ namespace Service.Verification.Api.Controllers
         [HttpPost("request")]
         public async Task<Response> RequestPhoneSetupCodeAsync([FromBody] SendPhoneSetupRequest request)
         {
+            var clientId = this.GetClientIdentity().ClientId;
+            if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
+                return Contracts.Response.OK();
+            
             var sendRequest = new SetupPhoneNumberRequest
             {
                 Lang = request.Language,
