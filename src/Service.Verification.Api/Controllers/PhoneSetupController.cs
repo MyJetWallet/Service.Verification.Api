@@ -50,8 +50,10 @@ namespace Service.Verification.Api.Controllers
                 PhoneNumber = request.PhoneNumber
             };
             var response = await _phoneSetupService.VerifyPhoneNumberAsync(verifyRequest);
-            return response.CodeIsValid 
-                ? Contracts.Response.OK()
+            return response.CodeIsValid
+                ? response.PhoneIsValid
+                    ? Contracts.Response.OK()
+                    : new Response(ApiResponseCodes.InvalidPhone)
                 : new Response(ApiResponseCodes.InvalidCode);
         }
 
