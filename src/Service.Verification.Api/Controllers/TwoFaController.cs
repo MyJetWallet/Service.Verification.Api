@@ -65,8 +65,29 @@ namespace Service.Verification.Api.Controllers
                 : new Response(ApiResponseCodes.InvalidCode);
         }
         
-        [HttpPost("request-change")]
-        public async Task<Response> Request2FaVerificationChangeAsync([FromBody] SendVerificationRequest request)
+        [HttpPost("request-enable")]
+        public async Task<Response> Request2FaVerificationEnableAsync([FromBody] SendVerificationRequest request)
+        {
+            var clientId = this.GetClientIdentity().ClientId;
+            if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
+                return Contracts.Response.OK();
+            
+            var sendRequest = new Send2FaChangeCodeRequest()
+            {
+                Lang = request.Language,
+                ClientId = clientId,
+                Brand = this.GetBrandId()
+            };
+            var response = await _twoFaVerificationCodes.Send2FaChangeCodeAsync(sendRequest);
+            return response.IsSuccess
+                ? Contracts.Response.OK()
+                : response.ErrorMessage.Contains("Phone number is not confirmed")
+                    ? new Response(ApiResponseCodes.PhoneIsNotConfirmed)
+                    : new Response(ApiResponseCodes.UnsuccessfulSend);
+        }
+        
+        [HttpPost("request-disable")]
+        public async Task<Response> Request2FaVerificationDisableAsync([FromBody] SendVerificationRequest request)
         {
             var clientId = this.GetClientIdentity().ClientId;
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
