@@ -112,11 +112,15 @@ namespace Service.Verification.Api.Controllers
         [HttpPost("verify-enable")]
         public async Task<Response> Verify2FaEnableAsync([FromBody] VerifyCodeRequest request)
         {
+            var tokenStr = this.GetSessionToken();
+            var (_, token) = MyControllerBaseHelper.ParseToken(tokenStr); 
+            
             var verifyRequest = new Verify2FaChangeCodeRequest()
             {
                 ClientId = this.GetClientIdentity().ClientId,
                 Code = request.Code,
-                IsEnable = true
+                IsEnable = true,
+                RootSessionId = token.RootSessionId.ToString()
             };
             var response = await _twoFaVerificationCodes.Verify2FaChangeAsync(verifyRequest);
             return response.CodeIsValid 

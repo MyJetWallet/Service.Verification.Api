@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyJetWallet.Sdk.Authorization.Http;
 using Service.Verification.Api.Controllers.Contracts;
 using Service.VerificationCodes.Grpc;
 using Service.VerificationCodes.Grpc.Models;
@@ -51,12 +52,16 @@ namespace Service.Verification.Api.Controllers
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
                 return new Response(ApiResponseCodes.InvalidCode);
             
+            var tokenStr = this.GetSessionToken();
+            var (_, token) = MyControllerBaseHelper.ParseToken(tokenStr); 
+            
             var verifyRequest = new VerifyPhoneRequest()
             {
                 ClientId = this.GetClientIdentity().ClientId,
                 Code = request.Code,
                 ClientIp = accessor.HttpContext.GetIp(),
-                PhoneNumber = request.PhoneNumber
+                PhoneNumber = request.PhoneNumber,
+                RootSessionId = token.RootSessionId.ToString()
             };
             var response = await _phoneSetupService.VerifyPhoneNumberAsync(verifyRequest);
             return response.CodeIsValid
