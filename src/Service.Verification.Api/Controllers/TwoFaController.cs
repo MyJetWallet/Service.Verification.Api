@@ -76,7 +76,8 @@ namespace Service.Verification.Api.Controllers
             {
                 Lang = request.Language,
                 ClientId = clientId,
-                Brand = this.GetBrandId()
+                Brand = this.GetBrandId(),
+                IsEnable = true
             };
             var response = await _twoFaVerificationCodes.Send2FaChangeCodeAsync(sendRequest);
             return response.IsSuccess
@@ -97,7 +98,8 @@ namespace Service.Verification.Api.Controllers
             {
                 Lang = request.Language,
                 ClientId = clientId,
-                Brand = this.GetBrandId()
+                Brand = this.GetBrandId(),
+                IsEnable = false
             };
             var response = await _twoFaVerificationCodes.Send2FaChangeCodeAsync(sendRequest);
             return response.IsSuccess
