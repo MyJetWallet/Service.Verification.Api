@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyJetWallet.Sdk.Authorization.Http;
 using Service.Verification.Api.Controllers.Contracts;
+using Service.Verification.Api.Validators;
 using Service.VerificationCodes.Grpc;
 using Service.VerificationCodes.Grpc.Models;
 using SimpleTrading.PersonalData.Abstractions.Auth.Consts;
@@ -27,9 +28,16 @@ namespace Service.Verification.Api.Controllers
         [HttpPost("request")]
         public async Task<Response> RequestPhoneSetupCodeAsync([FromBody] SendPhoneSetupRequest request)
         {
+            var validator = new PhoneValidator();
+            var results = await validator.ValidateAsync(request);
+
+            if (!results.IsValid)
+                return new Response(ApiResponseCodes.InvalidPhone);
+            
             var clientId = this.GetClientIdentity().ClientId;
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
                 return Contracts.Response.OK();
+            
             
             var sendRequest = new SetupPhoneNumberRequest
             {
