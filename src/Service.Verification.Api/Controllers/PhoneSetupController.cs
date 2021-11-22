@@ -28,7 +28,7 @@ namespace Service.Verification.Api.Controllers
         [HttpPost("request")]
         public async Task<Response> RequestPhoneSetupCodeAsync([FromBody] SendPhoneSetupRequest request)
         {
-            var validator = new PhoneValidator();
+            var validator = new PhoneRequestValidator();
             var results = await validator.ValidateAsync(request);
 
             if (!results.IsValid)
@@ -56,6 +56,12 @@ namespace Service.Verification.Api.Controllers
         [HttpPost("verify")]
         public async Task<Response> VerifyPhoneSetupAsync([FromBody] VerifyPhoneSetupRequest request, [FromServices] IHttpContextAccessor accessor)
         {
+            var validator = new PhoneVerifyValidator();
+            var results = await validator.ValidateAsync(request);
+
+            if (!results.IsValid)
+                return new Response(ApiResponseCodes.InvalidPhone);
+            
             var clientId = this.GetClientIdentity().ClientId;
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
                 return new Response(ApiResponseCodes.InvalidCode);
