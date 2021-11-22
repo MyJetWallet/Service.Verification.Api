@@ -8,9 +8,10 @@ namespace Service.Verification.Api.Validators
     {
         public PhoneRequestValidator()
         {
+            RuleFor(x => x.PhoneNumber).Matches("^[+]{0,1}[0-9]*$");
             RuleFor(x => x.PhoneNumber).Length(8, 20);
             RuleFor(x => x.PhoneNumber).Must(t => t.StartsWith('+')).WithMessage("Phone number should starts with +").Must(t => !t.Any(char.IsWhiteSpace));
-            RuleFor(x => x.PhoneNumber).Matches("^[+]{0,1}[0-9]");
+            RuleFor(x => x.PhoneNumber).Must(t => !t.Any(char.IsWhiteSpace));
         }
     }
     
@@ -18,9 +19,10 @@ namespace Service.Verification.Api.Validators
     {
         public PhoneVerifyValidator()
         {
+            RuleFor(x => x.PhoneNumber).Matches("^[+]{0,1}[0-9]*$");
             RuleFor(x => x.PhoneNumber).Length(8, 20);
             RuleFor(x => x.PhoneNumber).Must(t => t.StartsWith('+')).WithMessage("Phone number should starts with +").Must(t => !t.Any(char.IsWhiteSpace));
-            RuleFor(x => x.PhoneNumber).Matches("^[+]{0,1}[0-9]");
+            RuleFor(x => x.PhoneNumber).Must(t => !t.Any(char.IsWhiteSpace));
         }
     }
 }
