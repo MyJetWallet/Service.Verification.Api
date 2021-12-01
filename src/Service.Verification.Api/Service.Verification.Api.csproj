@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.2.0" />
-    <PackageReference Include="FluentValidation" Version="10.3.4" />
+    <PackageReference Include="FluentValidation" Version="10.3.5" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
     <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
@@ -25,7 +25,7 @@
     <PackageReference Include="SimpleTrading.PersonalData.Abstractions" Version="1.0.20" />
     <PackageReference Include="SimpleTrading.ServiceStatusReporterConnector" Version="1.0.9" />
     <PackageReference Include="MySettingsReader" Version="1.2.1" />
-    <PackageReference Include="NSwag.AspNetCore" Version="13.14.7" />
+    <PackageReference Include="NSwag.AspNetCore" Version="13.14.8" />
     <PackageReference Include="MyJetWallet.Sdk.Authorization" Version="2.1.0" />
     <PackageReference Include="MyJetWallet.Domain" Version="1.1.0" />
     <PackageReference Include="MyJetWallet.Sdk.NoSql" Version="2.0.2" />
