@@ -27,7 +27,7 @@
     <PackageReference Include="MySettingsReader" Version="1.2.1" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.15.3" />
     <PackageReference Include="MyJetWallet.Sdk.Authorization" Version="2.1.0" />
-    <PackageReference Include="MyJetWallet.Domain" Version="1.1.0" />
+    <PackageReference Include="MyJetWallet.Domain" Version="1.1.1" />
     <PackageReference Include="MyJetWallet.Sdk.NoSql" Version="2.0.2" />
   </ItemGroup>
 
