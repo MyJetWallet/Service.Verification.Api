@@ -7,5 +7,7 @@ namespace Service.Verification.Api.Controllers.Contracts
         
         public string PhoneCode { get; set; }
         public string PhoneBody { get; set; }
+        public string PhoneIso { get; set; }
+
     }
 }

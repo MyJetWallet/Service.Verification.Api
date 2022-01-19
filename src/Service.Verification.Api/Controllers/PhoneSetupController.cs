@@ -45,7 +45,8 @@ namespace Service.Verification.Api.Controllers
                 PhoneNumber = request.PhoneNumber,
                 ClientId = this.GetClientIdentity().ClientId,
                 PhoneCode = request.PhoneCode,
-                PhoneBody = request.PhoneBody
+                PhoneBody = request.PhoneBody,
+                PhoneIso = request.PhoneIso,
             };
             var response = await _phoneSetupService.SetupPhoneNumberAsync(sendRequest);
             return response.IsSuccess
@@ -79,7 +80,8 @@ namespace Service.Verification.Api.Controllers
                 PhoneNumber = request.PhoneNumber,
                 RootSessionId = token.RootSessionId.ToString(),
                 PhoneCode = request.PhoneCode,
-                PhoneBody = request.PhoneBody
+                PhoneBody = request.PhoneBody,
+                PhoneIso = request.PhoneIso,
             };
             var response = await _phoneSetupService.VerifyPhoneNumberAsync(verifyRequest);
             return response.CodeIsValid
