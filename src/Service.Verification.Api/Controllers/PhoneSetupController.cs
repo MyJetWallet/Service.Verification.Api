@@ -42,7 +42,7 @@ namespace Service.Verification.Api.Controllers
             var sendRequest = new SetupPhoneNumberRequest
             {
                 Lang = request.Language,
-                PhoneNumber = request.PhoneNumber,
+                PhoneNumber = $"{request.PhoneCode}{request.PhoneBody}",
                 ClientId = this.GetClientIdentity().ClientId,
                 PhoneCode = request.PhoneCode,
                 PhoneBody = request.PhoneBody,
@@ -77,7 +77,7 @@ namespace Service.Verification.Api.Controllers
                 ClientId = this.GetClientIdentity().ClientId,
                 Code = request.Code,
                 ClientIp = accessor.HttpContext.GetIp(),
-                PhoneNumber = request.PhoneNumber,
+                PhoneNumber = $"{request.PhoneCode}{request.PhoneBody}",
                 RootSessionId = token.RootSessionId.ToString(),
                 PhoneCode = request.PhoneCode,
                 PhoneBody = request.PhoneBody,
