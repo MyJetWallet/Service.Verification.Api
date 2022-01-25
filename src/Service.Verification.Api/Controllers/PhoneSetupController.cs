@@ -1,14 +1,18 @@
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyJetWallet.Sdk.Authorization.Http;
+using MyJetWallet.Sdk.WalletApi.Contracts;
 using Service.Verification.Api.Controllers.Contracts;
 using Service.Verification.Api.Validators;
 using Service.VerificationCodes.Grpc;
 using Service.VerificationCodes.Grpc.Models;
 using SimpleTrading.PersonalData.Abstractions.Auth.Consts;
+using ApiResponseCodes = Service.Verification.Api.Controllers.Contracts.ApiResponseCodes;
+using Response = Service.Verification.Api.Controllers.Contracts.Response;
 using VerifyCodeRequest = Service.Verification.Api.Controllers.Contracts.VerifyCodeRequest;
 
 namespace Service.Verification.Api.Controllers
@@ -33,6 +37,9 @@ namespace Service.Verification.Api.Controllers
 
             if (!results.IsValid)
                 return new Response(ApiResponseCodes.InvalidPhone);
+            
+            if(string.IsNullOrWhiteSpace(request.Language))
+                throw new WalletApiHttpException("Language not set", HttpStatusCode.BadRequest);
             
             var clientId = this.GetClientIdentity().ClientId;
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
@@ -92,15 +99,15 @@ namespace Service.Verification.Api.Controllers
         }
 
         [HttpGet("get-number")]
-        public async Task<Response<string>> GetPhone()
+        public async Task<Contracts.Response<string>> GetPhone()
         {
             var response = await _phoneSetupService.GetUserPhoneNumber(new GetPhoneRequest()
             {
                 ClientId = this.GetClientIdentity().ClientId
             });
             return response.IsSuccess 
-                ? new Response<string>(response.PhoneNumber) 
-                : new Response<string>(ApiResponseCodes.PhoneNotFound);
+                ? new Contracts.Response<string>(response.PhoneNumber) 
+                : new Contracts.Response<string>(ApiResponseCodes.PhoneNotFound);
         }
     }
 }

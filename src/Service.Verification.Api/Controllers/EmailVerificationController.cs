@@ -1,13 +1,17 @@
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyJetWallet.Sdk.Authorization.Http;
+using MyJetWallet.Sdk.WalletApi.Contracts;
 using Service.Verification.Api.Controllers.Contracts;
 using Service.VerificationCodes.Grpc;
 using Service.VerificationCodes.Grpc.Models;
 using SimpleTrading.PersonalData.Abstractions.Auth.Consts;
+using ApiResponseCodes = Service.Verification.Api.Controllers.Contracts.ApiResponseCodes;
+using Response = Service.Verification.Api.Controllers.Contracts.Response;
 using VerifyCodeRequest = Service.Verification.Api.Controllers.Contracts.VerifyCodeRequest;
 
 namespace Service.Verification.Api.Controllers
@@ -30,6 +34,9 @@ namespace Service.Verification.Api.Controllers
             var clientId = this.GetClientIdentity().ClientId;
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
                 return Contracts.Response.OK();
+            
+            if(string.IsNullOrWhiteSpace(request.Language))
+                throw new WalletApiHttpException("Language not set", HttpStatusCode.BadRequest);
             
             var sendRequest = new SendVerificationCodeRequest
             {
