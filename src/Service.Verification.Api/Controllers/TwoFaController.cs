@@ -26,11 +26,14 @@ namespace Service.Verification.Api.Controllers
 
         [HttpPost("request-verification")]
         public async Task<Response> Request2FaVerificationCodeAsync([FromBody] SendVerificationRequest request)
-        {
+        {            
+            if(string.IsNullOrWhiteSpace(request.Language))
+                return new Response(ApiResponseCodes.LanguageNotSet);
+            
             var clientId = this.GetClientIdentity().ClientId;
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
                 return Contracts.Response.OK();
-            
+
             var tokenStr = this.GetSessionToken();
             var (_, token) = MyControllerBaseHelper.ParseToken(tokenStr); 
             
@@ -68,10 +71,13 @@ namespace Service.Verification.Api.Controllers
         [HttpPost("request-enable")]
         public async Task<Response> Request2FaVerificationEnableAsync([FromBody] SendVerificationRequest request)
         {
+            if(string.IsNullOrWhiteSpace(request.Language))
+                return new Response(ApiResponseCodes.LanguageNotSet);
+            
             var clientId = this.GetClientIdentity().ClientId;
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
                 return Contracts.Response.OK();
-            
+
             var sendRequest = new Send2FaChangeCodeRequest()
             {
                 Lang = request.Language,
@@ -90,6 +96,9 @@ namespace Service.Verification.Api.Controllers
         [HttpPost("request-disable")]
         public async Task<Response> Request2FaVerificationDisableAsync([FromBody] SendVerificationRequest request)
         {
+            if(string.IsNullOrWhiteSpace(request.Language))
+                return new Response(ApiResponseCodes.LanguageNotSet);
+            
             var clientId = this.GetClientIdentity().ClientId;
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
                 return Contracts.Response.OK();

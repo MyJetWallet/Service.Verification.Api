@@ -39,7 +39,7 @@ namespace Service.Verification.Api.Controllers
                 return new Response(ApiResponseCodes.InvalidPhone);
             
             if(string.IsNullOrWhiteSpace(request.Language))
-                throw new WalletApiHttpException("Language not set", HttpStatusCode.BadRequest);
+                return new Response(ApiResponseCodes.LanguageNotSet);
             
             var clientId = this.GetClientIdentity().ClientId;
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))

@@ -24,6 +24,9 @@ namespace Service.Verification.Api.Controllers
         [HttpPost("request")]
         public async Task<Response> RequestWithdrawalVerificationCodeAsync([FromBody] SendTransferVerificationRequest request, [FromServices] IHttpContextAccessor accessor)
         {
+            if(string.IsNullOrWhiteSpace(request.Language))
+                return new Response(ApiResponseCodes.LanguageNotSet);
+            
             var clientId = this.GetClientIdentity().ClientId;
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
                 return Contracts.Response.OK();

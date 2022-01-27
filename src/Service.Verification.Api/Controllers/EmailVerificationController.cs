@@ -30,13 +30,13 @@ namespace Service.Verification.Api.Controllers
 
         [HttpPost("request")]
         public async Task<Response> RequestEmailVerificationCodeAsync([FromBody] SendVerificationRequest request)
-        {
+        {            
+            if(string.IsNullOrWhiteSpace(request.Language))
+                return new Response(ApiResponseCodes.LanguageNotSet);
+            
             var clientId = this.GetClientIdentity().ClientId;
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
                 return Contracts.Response.OK();
-            
-            if(string.IsNullOrWhiteSpace(request.Language))
-                throw new WalletApiHttpException("Language not set", HttpStatusCode.BadRequest);
             
             var sendRequest = new SendVerificationCodeRequest
             {
