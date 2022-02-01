@@ -32,6 +32,9 @@ namespace Service.Verification.Api.Controllers
         [HttpPost("request")]
         public async Task<Response> RequestPhoneSetupCodeAsync([FromBody] SendPhoneSetupRequest request)
         {
+            if (request.PhoneCode != null && !request.PhoneCode.StartsWith('+'))
+                request.PhoneCode = $"+{request.PhoneCode}";
+            
             var validator = new PhoneRequestValidator();
             var results = await validator.ValidateAsync(request);
 
@@ -66,6 +69,9 @@ namespace Service.Verification.Api.Controllers
         [HttpPost("verify")]
         public async Task<Response> VerifyPhoneSetupAsync([FromBody] VerifyPhoneSetupRequest request, [FromServices] IHttpContextAccessor accessor)
         {
+            if (request.PhoneCode != null && !request.PhoneCode.StartsWith('+'))
+                request.PhoneCode = $"+{request.PhoneCode}";
+            
             var validator = new PhoneVerifyValidator();
             var results = await validator.ValidateAsync(request);
 
