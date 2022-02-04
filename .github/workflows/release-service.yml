@@ -95,7 +95,7 @@ jobs:
         ref: uat
         token: ${{ secrets.UAT_GIT_TOKEN }}
     - run: |
-        pattern=myjetwallet.service.wallet.api:.*$
+        pattern=myjetwallet.service.verification.api:.*$
         imagename=myjetwallet.service.wallet.api:${GITHUB_REF#refs/tags/}
         reg=$"s/${pattern}/${imagename}/g"
         echo $reg
