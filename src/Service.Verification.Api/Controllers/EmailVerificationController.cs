@@ -69,5 +69,19 @@ namespace Service.Verification.Api.Controllers
                 ? Contracts.Response.OK()
                 : new Response(ApiResponseCodes.InvalidCode);
         }
+        
+        [AllowAnonymous]
+        [HttpPost("verifytoken")]
+        public async Task<Response> VerifyEmailCodeWithTokenAsync([FromBody] TokenRequest request, [FromServices] IHttpContextAccessor accessor)
+        {
+            var response = await _emailVerificationService.VerifyEmailCodeWithTokenAsync(new VerifyCodeWithTokenRequest()
+            {
+                Token = request.Token,
+                ClientIp = accessor.HttpContext.GetIp()
+            });
+            return response.CodeIsValid 
+                ? Contracts.Response.OK()
+                : new Response(ApiResponseCodes.InvalidCode);
+        }
     }
 }

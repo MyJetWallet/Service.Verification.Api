@@ -61,5 +61,19 @@ namespace Service.Verification.Api.Controllers
             var response = await _transferVerificationService.VerifyTransferCodeAsync(verifyRequest);
             return Redirect(response.RedirectLink);
         }
+        
+        [AllowAnonymous]
+        [HttpPost("verify")]
+        public async Task<Response> VerifyWithdrawalCodeWithTokenAsync([FromBody] TokenRequest request, [FromServices] IHttpContextAccessor accessor)
+        {
+            var response = await _transferVerificationService.VerifyTransferCodeWithTokenAsync(new VerifyTransferCodeWithTokenRequest()
+            {
+                Token = request.Token,
+                ClientIp = accessor.HttpContext.GetIp(),
+            });
+            return response.CodeIsValid 
+                ? Contracts.Response.OK()
+                : new Response(ApiResponseCodes.InvalidCode);
+        }
     }
 }
