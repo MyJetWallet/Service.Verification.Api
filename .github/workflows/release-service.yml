@@ -102,5 +102,5 @@ jobs:
         find . -type f -name "slot-*.yaml" -print0 -exec sed -i -r $reg {} \;
         git config user.name github-actions
         git config user.email github-actions@github.com
-        git commit -a -m "Update version of service myjetwallet.service.wallet.api"
+        git commit -a -m "Update version of service myjetwallet.service.verification.api"
         git push
