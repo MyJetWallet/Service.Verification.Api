@@ -51,7 +51,7 @@ namespace Service.Verification.Api.Controllers
         
         [AllowAnonymous]
         [HttpGet("verify")]
-        public async Task<ActionResult> VerifyWithdrawalCodeAsync([FromQuery] string withdrawalProcessId, string code, string brand, [FromServices] IHttpContextAccessor accessor)
+        public async Task<ActionResult> VerifyWithdrawalAsync([FromQuery] string withdrawalProcessId, string code, string brand, [FromServices] IHttpContextAccessor accessor)
         {
             var verifyRequest = new VerifyWithdrawalCodeRequest()
             {
@@ -62,6 +62,24 @@ namespace Service.Verification.Api.Controllers
             };
             var response = await _withdrawalVerificationService.VerifyWithdrawalCodeAsync(verifyRequest);
             return Redirect(response.RedirectLink);
+        }
+        
+        [AllowAnonymous]
+        [HttpPost("verify-code")]
+        public async Task<Response> VerifyWithdrawalCodeAsync([FromQuery] string withdrawalProcessId, string code, string brand, [FromServices] IHttpContextAccessor accessor)
+        {
+            var verifyRequest = new VerifyWithdrawalCodeRequest()
+            {
+                WithdrawalProcessId = withdrawalProcessId,
+                Code = code,
+                ClientIp = accessor.HttpContext.GetIp(),
+                Brand = brand
+            };
+            var response = await _withdrawalVerificationService.VerifyWithdrawalCodeAsync(verifyRequest);
+
+            return response.CodeIsValid 
+                ? Contracts.Response.OK()
+                : new Response(ApiResponseCodes.InvalidCode);
         }
 
         [AllowAnonymous]
