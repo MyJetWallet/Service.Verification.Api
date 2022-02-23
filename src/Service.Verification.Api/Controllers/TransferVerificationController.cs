@@ -49,7 +49,7 @@ namespace Service.Verification.Api.Controllers
         
         [AllowAnonymous]
         [HttpGet("verify")]
-        public async Task<ActionResult> VerifyWithdrawalCodeAsync([FromQuery] string transferProcessId, string code, string brand, [FromServices] IHttpContextAccessor accessor)
+        public async Task<ActionResult> VerifyTransferAsync([FromQuery] string transferProcessId, string code, string brand, [FromServices] IHttpContextAccessor accessor)
         {
             var verifyRequest = new VerifyTransferCodeRequest()
             {
@@ -63,8 +63,24 @@ namespace Service.Verification.Api.Controllers
         }
         
         [AllowAnonymous]
+        [HttpPost("verify-code")]
+        public async Task<ActionResult> VerifyTransferCodeAsync([FromQuery] string transferProcessId, string code, string brand, [FromServices] IHttpContextAccessor accessor)
+        {
+            var verifyRequest = new VerifyTransferCodeRequest()
+            {
+                TransferId = transferProcessId,
+                Code = code,
+                ClientIp = accessor.HttpContext.GetIp(),
+                Brand = brand
+            };
+            var response = await _transferVerificationService.VerifyTransferCodeAsync(verifyRequest);
+            return Redirect(response.RedirectLink);
+        }
+
+        
+        [AllowAnonymous]
         [HttpPost("verify")]
-        public async Task<Response> VerifyWithdrawalCodeWithTokenAsync([FromBody] TokenRequest request, [FromServices] IHttpContextAccessor accessor)
+        public async Task<Response> VerifyTransferCodeWithTokenAsync([FromBody] TokenRequest request, [FromServices] IHttpContextAccessor accessor)
         {
             var response = await _transferVerificationService.VerifyTransferCodeWithTokenAsync(new VerifyTransferCodeWithTokenRequest()
             {
