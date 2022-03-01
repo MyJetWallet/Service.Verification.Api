@@ -66,14 +66,14 @@ namespace Service.Verification.Api.Controllers
         
         [AllowAnonymous]
         [HttpPost("verify-code")]
-        public async Task<Response> VerifyWithdrawalCodeAsync([FromQuery] string withdrawalProcessId, string code, string brand, [FromServices] IHttpContextAccessor accessor)
+        public async Task<Response> VerifyWithdrawalCodeAsync([FromBody] OperationVerificationRequest request, [FromServices] IHttpContextAccessor accessor)
         {
             var verifyRequest = new VerifyWithdrawalCodeRequest()
             {
-                WithdrawalProcessId = withdrawalProcessId,
-                Code = code,
+                WithdrawalProcessId = request.OperationId,
+                Code = request.Code,
                 ClientIp = accessor.HttpContext.GetIp(),
-                Brand = brand
+                Brand = request.Brand
             };
             var response = await _withdrawalVerificationService.VerifyWithdrawalCodeAsync(verifyRequest);
 

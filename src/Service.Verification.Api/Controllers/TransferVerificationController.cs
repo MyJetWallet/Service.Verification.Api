@@ -64,17 +64,19 @@ namespace Service.Verification.Api.Controllers
         
         [AllowAnonymous]
         [HttpPost("verify-code")]
-        public async Task<ActionResult> VerifyTransferCodeAsync([FromQuery] string transferProcessId, string code, string brand, [FromServices] IHttpContextAccessor accessor)
+        public async Task<Response> VerifyTransferCodeAsync([FromBody] OperationVerificationRequest request, [FromServices] IHttpContextAccessor accessor)
         {
             var verifyRequest = new VerifyTransferCodeRequest()
             {
-                TransferId = transferProcessId,
-                Code = code,
+                TransferId = request.OperationId,
+                Code = request.Code,
                 ClientIp = accessor.HttpContext.GetIp(),
-                Brand = brand
+                Brand = request.Brand
             };
             var response = await _transferVerificationService.VerifyTransferCodeAsync(verifyRequest);
-            return Redirect(response.RedirectLink);
+            return response.CodeIsValid 
+                ? Contracts.Response.OK()
+                : new Response(ApiResponseCodes.InvalidCode);
         }
 
         
