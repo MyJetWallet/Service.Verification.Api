@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyJetWallet.ApiSecurityManager.ApiKeys;
+using MyJetWallet.Sdk.Authorization.Extensions;
 using MyJetWallet.Sdk.Authorization.Http;
 using MyJetWallet.Sdk.WalletApi.Contracts;
 using Service.Verification.Api.Controllers.Contracts;
@@ -23,10 +25,13 @@ namespace Service.Verification.Api.Controllers
     public class PhoneSetupController : Controller
     {
         private readonly IPhoneSetupService _phoneSetupService;
+        private readonly IApiKeyStorage _apiKeyStorage;
 
-        public PhoneSetupController(IPhoneSetupService phoneSetupService)
+        public PhoneSetupController(IPhoneSetupService phoneSetupService,
+            IApiKeyStorage apiKeyStorage)
         {
             _phoneSetupService = phoneSetupService;
+            _apiKeyStorage = apiKeyStorage;
         }
 
         [HttpPost("request")]
@@ -83,7 +88,7 @@ namespace Service.Verification.Api.Controllers
                 return new Response(ApiResponseCodes.InvalidCode);
             
             var tokenStr = this.GetSessionToken();
-            var (_, token) = MyControllerBaseHelper.ParseToken(tokenStr); 
+            var (_, token) = await _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
             
             var verifyRequest = new VerifyPhoneRequest()
             {

@@ -25,5 +25,11 @@ namespace Service.Verification.Api.Settings
         
         [YamlProperty("VerificationApi.MyNoSqlReaderHostPort")]
         public string MyNoSqlReaderHostPort { get; set; }
+
+        [YamlProperty("VerificationApi.SessionEncryptionKeyId")]
+        public string SessionEncryptionApiKeyId { get; set; }
+
+        [YamlProperty("VerificationApi.MyNoSqlWriterUrl")]
+        public string MyNoSqlWriterUrl { get; set; }
     }
 }

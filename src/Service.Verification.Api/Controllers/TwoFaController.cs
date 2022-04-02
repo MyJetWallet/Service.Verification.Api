@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyJetWallet.ApiSecurityManager.ApiKeys;
+using MyJetWallet.Sdk.Authorization.Extensions;
 using MyJetWallet.Sdk.Authorization.Http;
 using Service.Verification.Api.Controllers.Contracts;
 using Service.VerificationCodes.Grpc;
@@ -18,10 +20,13 @@ namespace Service.Verification.Api.Controllers
     public class TwoFaVerificationController : Controller
     {
         private readonly ITwoFaVerificationCodes _twoFaVerificationCodes;
+        private readonly IApiKeyStorage _apiKeyStorage;
 
-        public TwoFaVerificationController(ITwoFaVerificationCodes twoFaVerificationCodes)
+        public TwoFaVerificationController(ITwoFaVerificationCodes twoFaVerificationCodes,
+            IApiKeyStorage apiKeyStorage)
         {
             _twoFaVerificationCodes = twoFaVerificationCodes;
+            _apiKeyStorage = apiKeyStorage;
         }
 
         [HttpPost("request-verification")]
@@ -35,7 +40,7 @@ namespace Service.Verification.Api.Controllers
                 return Contracts.Response.OK();
 
             var tokenStr = this.GetSessionToken();
-            var (_, token) = MyControllerBaseHelper.ParseToken(tokenStr); 
+            var (_, token) = await _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
             
             var sendRequest = new Send2FaVerificationCodeRequest()
             {
@@ -54,7 +59,7 @@ namespace Service.Verification.Api.Controllers
         public async Task<Response> Verify2FaCodeAsync([FromBody] VerifyCodeRequest request)
         {
             var tokenStr = this.GetSessionToken();
-            var (_, token) = MyControllerBaseHelper.ParseToken(tokenStr); 
+            var (_, token) = await _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
             
             var verifyRequest = new Verify2FaCodeRequest()
             {
@@ -122,7 +127,7 @@ namespace Service.Verification.Api.Controllers
         public async Task<Response> Verify2FaEnableAsync([FromBody] VerifyCodeRequest request)
         {
             var tokenStr = this.GetSessionToken();
-            var (_, token) = MyControllerBaseHelper.ParseToken(tokenStr); 
+            var (_, token) = await _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
             
             var verifyRequest = new Verify2FaChangeCodeRequest()
             {

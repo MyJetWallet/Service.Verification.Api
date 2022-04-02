@@ -2,6 +2,7 @@
 using Autofac.Core;
 using Autofac.Core.Registration;
 using Microsoft.AspNetCore.Http;
+using MyJetWallet.ApiSecurityManager.Autofac;
 using MyJetWallet.Sdk.Authorization.NoSql;
 using MyJetWallet.Sdk.NoSql;
 using MyJetWallet.Sdk.Service;
@@ -14,7 +15,7 @@ namespace Service.Verification.Api.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-
+            builder.RegisterEncryptionServiceClient("verification-api", () => Program.Settings.MyNoSqlWriterUrl);
             builder.RegisterType<HttpContextAccessor>().As<IHttpContextAccessor>().SingleInstance();
             
             VerificationCodes.Client.AutofacHelper.RegisterVerificationCodesClient(builder, Program.Settings.VerificationCodesGrpcUrl);

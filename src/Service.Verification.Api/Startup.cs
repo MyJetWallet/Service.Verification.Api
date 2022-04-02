@@ -16,6 +16,8 @@ using Service.Verification.Api.Modules;
 using SimpleTrading.BaseMetrics;
 using SimpleTrading.ServiceStatusReporterConnector;
 using SimpleTrading.TokensManager;
+using MyJetWallet.ApiSecurityManager.Autofac;
+using MyJetWallet.Sdk.WalletApi;
 
 namespace Service.Verification.Api
 {
@@ -23,26 +25,10 @@ namespace Service.Verification.Api
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCodeFirstGrpc(options =>
-            {
-                options.Interceptors.Add<PrometheusMetricsInterceptor>();
-                options.BindMetricsInterceptors();
-            });
+            StartupUtils.SetupWalletServices(services, Program.Settings.SessionEncryptionApiKeyId);
 
-            services.AddHostedService<ApplicationLifetimeManager>();
-
-            services.SetupSwaggerDocumentation();
-            services.ConfigurateHeaders();
-            services.AddControllers(options =>
-            {
-
-            });
-
-            services
-                .AddAuthentication(o => { o.DefaultScheme = "Bearer"; })
-                .AddScheme<MyAuthenticationOptions, RootSessionAuthHandler>("Bearer", o => { });
-
-            services.AddMyTelemetry("SP-", Program.Settings.ZipkinUrl);
+            services.AddHttpContextAccessor();
+            services.ConfigureJetWallet<ApplicationLifetimeManager>(Program.Settings.ZipkinUrl);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -78,6 +64,8 @@ namespace Service.Verification.Api
 
             app.UseEndpoints(endpoints =>
             {
+                //security
+                endpoints.RegisterGrpcServices();
                 endpoints.MapControllers();
 
                 endpoints.MapGet("/", async context =>
