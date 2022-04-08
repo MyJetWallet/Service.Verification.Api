@@ -15,7 +15,7 @@ namespace Service.Verification.Api.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterEncryptionServiceClient("verification-api", () => Program.Settings.MyNoSqlWriterUrl);
+            builder.RegisterEncryptionServiceClient();
             builder.RegisterType<HttpContextAccessor>().As<IHttpContextAccessor>().SingleInstance();
             
             VerificationCodes.Client.AutofacHelper.RegisterVerificationCodesClient(builder, Program.Settings.VerificationCodesGrpcUrl);

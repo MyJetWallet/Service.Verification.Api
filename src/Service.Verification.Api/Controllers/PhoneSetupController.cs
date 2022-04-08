@@ -88,7 +88,7 @@ namespace Service.Verification.Api.Controllers
                 return new Response(ApiResponseCodes.InvalidCode);
             
             var tokenStr = this.GetSessionToken();
-            var (_, token) = await _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
+            var (_, token) = _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
             
             var verifyRequest = new VerifyPhoneRequest()
             {

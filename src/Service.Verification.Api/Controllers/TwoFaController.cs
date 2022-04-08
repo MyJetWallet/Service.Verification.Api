@@ -40,7 +40,7 @@ namespace Service.Verification.Api.Controllers
                 return Contracts.Response.OK();
 
             var tokenStr = this.GetSessionToken();
-            var (_, token) = await _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
+            var (_, token) = _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
             
             var sendRequest = new Send2FaVerificationCodeRequest()
             {
@@ -59,7 +59,7 @@ namespace Service.Verification.Api.Controllers
         public async Task<Response> Verify2FaCodeAsync([FromBody] VerifyCodeRequest request)
         {
             var tokenStr = this.GetSessionToken();
-            var (_, token) = await _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
+            var (_, token) = _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
             
             var verifyRequest = new Verify2FaCodeRequest()
             {
@@ -127,7 +127,7 @@ namespace Service.Verification.Api.Controllers
         public async Task<Response> Verify2FaEnableAsync([FromBody] VerifyCodeRequest request)
         {
             var tokenStr = this.GetSessionToken();
-            var (_, token) = await _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
+            var (_, token) = _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
             
             var verifyRequest = new Verify2FaChangeCodeRequest()
             {
