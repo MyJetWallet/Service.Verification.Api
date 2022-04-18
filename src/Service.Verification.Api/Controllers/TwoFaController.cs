@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using MyJetWallet.ApiSecurityManager.ApiKeys;
 using MyJetWallet.Sdk.Authorization.Extensions;
 using MyJetWallet.Sdk.Authorization.Http;
-using Service.ClientBlocker.Grpc;
-using Service.ClientBlocker.Grpc.Models;
 using Service.Verification.Api.Controllers.Contracts;
 using Service.VerificationCodes.Grpc;
 using Service.VerificationCodes.Grpc.Models;
@@ -21,29 +19,27 @@ namespace Service.Verification.Api.Controllers
     {
         private readonly ITwoFaVerificationCodes _twoFaVerificationCodes;
         private readonly IApiKeyStorage _apiKeyStorage;
-        private readonly IClientAttemptService _clientAttemptService;
 
         public TwoFaVerificationController(ITwoFaVerificationCodes twoFaVerificationCodes,
-            IApiKeyStorage apiKeyStorage, IClientAttemptService clientAttemptService)
+            IApiKeyStorage apiKeyStorage)
         {
             _twoFaVerificationCodes = twoFaVerificationCodes;
             _apiKeyStorage = apiKeyStorage;
-            _clientAttemptService = clientAttemptService;
         }
 
         [HttpPost("request-verification")]
         public async Task<Response> Request2FaVerificationCodeAsync([FromBody] SendVerificationRequest request)
-        {            
-            if(string.IsNullOrWhiteSpace(request.Language))
+        {
+            if (string.IsNullOrWhiteSpace(request.Language))
                 return new Response(ApiResponseCodes.LanguageNotSet);
-            
+
             var clientId = this.GetClientIdentity().ClientId;
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
                 return Contracts.Response.OK();
 
             var tokenStr = this.GetSessionToken();
             var (_, token) = _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
-            
+
             var sendRequest = new Send2FaVerificationCodeRequest()
             {
                 Lang = request.Language,
@@ -56,16 +52,10 @@ namespace Service.Verification.Api.Controllers
 
             if (!response.IsSuccess)
                 return new Response(ApiResponseCodes.UnsuccessfulSend);
-            
-            await _clientAttemptService.Track2FaResendAttempt(new TrackAttemptRequest
-            {
-                ClientId = clientId,
-                IsSuccess = false
-            });
 
             return Contracts.Response.OK();
         }
-        
+
         [HttpPost("verify")]
         public async Task<Response> Verify2FaCodeAsync([FromBody] VerifyCodeRequest request)
         {
@@ -73,7 +63,7 @@ namespace Service.Verification.Api.Controllers
             var (_, token) = _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
 
             var clientId = this.GetClientIdentity().ClientId;
-            
+
             var verifyRequest = new Verify2FaCodeRequest
             {
                 ClientId = clientId,
@@ -82,31 +72,17 @@ namespace Service.Verification.Api.Controllers
             };
             var response = await _twoFaVerificationCodes.Verify2FaCodeAsync(verifyRequest);
 
-            var trackRequest = new TrackAttemptRequest
-            {
-                ClientId = clientId,
-                IsSuccess = response.CodeIsValid
-            };
-            
-            await _clientAttemptService.Track2FaAttempt(trackRequest);
-            
-            await _clientAttemptService.Track2FaResendAttempt(new TrackAttemptRequest
-            {
-                ClientId = clientId,
-                IsSuccess = true
-            });
-
-            return response.CodeIsValid 
+            return response.CodeIsValid
                 ? Contracts.Response.OK()
                 : new Response(ApiResponseCodes.InvalidCode);
         }
-        
+
         [HttpPost("request-enable")]
         public async Task<Response> Request2FaVerificationEnableAsync([FromBody] SendVerificationRequest request)
         {
-            if(string.IsNullOrWhiteSpace(request.Language))
+            if (string.IsNullOrWhiteSpace(request.Language))
                 return new Response(ApiResponseCodes.LanguageNotSet);
-            
+
             var clientId = this.GetClientIdentity().ClientId;
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
                 return Contracts.Response.OK();
@@ -125,17 +101,17 @@ namespace Service.Verification.Api.Controllers
                     ? new Response(ApiResponseCodes.PhoneIsNotConfirmed)
                     : new Response(ApiResponseCodes.UnsuccessfulSend);
         }
-        
+
         [HttpPost("request-disable")]
         public async Task<Response> Request2FaVerificationDisableAsync([FromBody] SendVerificationRequest request)
         {
-            if(string.IsNullOrWhiteSpace(request.Language))
+            if (string.IsNullOrWhiteSpace(request.Language))
                 return new Response(ApiResponseCodes.LanguageNotSet);
-            
+
             var clientId = this.GetClientIdentity().ClientId;
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
                 return Contracts.Response.OK();
-            
+
             var sendRequest = new Send2FaChangeCodeRequest()
             {
                 Lang = request.Language,
@@ -150,13 +126,13 @@ namespace Service.Verification.Api.Controllers
                     ? new Response(ApiResponseCodes.PhoneIsNotConfirmed)
                     : new Response(ApiResponseCodes.UnsuccessfulSend);
         }
-        
+
         [HttpPost("verify-enable")]
         public async Task<Response> Verify2FaEnableAsync([FromBody] VerifyCodeRequest request)
         {
             var tokenStr = this.GetSessionToken();
             var (_, token) = _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
-            
+
             var verifyRequest = new Verify2FaChangeCodeRequest()
             {
                 ClientId = this.GetClientIdentity().ClientId,
@@ -165,11 +141,11 @@ namespace Service.Verification.Api.Controllers
                 RootSessionId = token.RootSessionId.ToString()
             };
             var response = await _twoFaVerificationCodes.Verify2FaChangeAsync(verifyRequest);
-            return response.CodeIsValid 
+            return response.CodeIsValid
                 ? Contracts.Response.OK()
                 : new Response(ApiResponseCodes.InvalidCode);
         }
-        
+
         [HttpPost("verify-disable")]
         public async Task<Response> Verify2FaDisableAsync([FromBody] VerifyCodeRequest request)
         {
@@ -180,7 +156,7 @@ namespace Service.Verification.Api.Controllers
                 IsEnable = false
             };
             var response = await _twoFaVerificationCodes.Verify2FaChangeAsync(verifyRequest);
-            return response.CodeIsValid 
+            return response.CodeIsValid
                 ? Contracts.Response.OK()
                 : new Response(ApiResponseCodes.InvalidCode);
         }
