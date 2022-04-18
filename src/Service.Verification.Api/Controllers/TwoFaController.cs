@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using MyJetWallet.ApiSecurityManager.ApiKeys;
 using MyJetWallet.Sdk.Authorization.Extensions;
 using MyJetWallet.Sdk.Authorization.Http;
+using Service.ClientBlocker.Grpc;
+using Service.ClientBlocker.Grpc.Models;
 using Service.Verification.Api.Controllers.Contracts;
 using Service.VerificationCodes.Grpc;
 using Service.VerificationCodes.Grpc.Models;
@@ -21,12 +23,14 @@ namespace Service.Verification.Api.Controllers
     {
         private readonly ITwoFaVerificationCodes _twoFaVerificationCodes;
         private readonly IApiKeyStorage _apiKeyStorage;
+        private readonly IClientAttemptService _clientAttemptService;
 
         public TwoFaVerificationController(ITwoFaVerificationCodes twoFaVerificationCodes,
-            IApiKeyStorage apiKeyStorage)
+            IApiKeyStorage apiKeyStorage, IClientAttemptService clientAttemptService)
         {
             _twoFaVerificationCodes = twoFaVerificationCodes;
             _apiKeyStorage = apiKeyStorage;
+            _clientAttemptService = clientAttemptService;
         }
 
         [HttpPost("request-verification")]
@@ -60,14 +64,25 @@ namespace Service.Verification.Api.Controllers
         {
             var tokenStr = this.GetSessionToken();
             var (_, token) = _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
+
+            var clientId = this.GetClientIdentity().ClientId;
             
-            var verifyRequest = new Verify2FaCodeRequest()
+            var verifyRequest = new Verify2FaCodeRequest
             {
-                ClientId = this.GetClientIdentity().ClientId,
+                ClientId = clientId,
                 Code = request.Code,
                 RootSessionId = token.RootSessionId.ToString()
             };
             var response = await _twoFaVerificationCodes.Verify2FaCodeAsync(verifyRequest);
+
+            var trackRequest = new TrackAttemptRequest
+            {
+                ClientId = clientId,
+                IsSuccess = response.CodeIsValid
+            };
+            
+            await _clientAttemptService.Track2FaAttempt(trackRequest);
+
             return response.CodeIsValid 
                 ? Contracts.Response.OK()
                 : new Response(ApiResponseCodes.InvalidCode);
