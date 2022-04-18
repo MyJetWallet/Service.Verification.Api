@@ -31,5 +31,8 @@ namespace Service.Verification.Api.Settings
 
         [YamlProperty("VerificationApi.MyNoSqlWriterUrl")]
         public string MyNoSqlWriterUrl { get; set; }
+        
+        [YamlProperty("VerificationApi.ClientBlockerGrpcClient")]
+        public string ClientBlockerGrpcClient { get; set; }
     }
 }
