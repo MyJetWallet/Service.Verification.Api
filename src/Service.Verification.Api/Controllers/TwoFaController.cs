@@ -51,10 +51,19 @@ namespace Service.Verification.Api.Controllers
                 Brand = this.GetBrandId(),
                 RootSessionId = token.RootSessionId.ToString()
             };
+
             var response = await _twoFaVerificationCodes.Send2FaVerificationCodeAsync(sendRequest);
-            return response.IsSuccess 
-                ? Contracts.Response.OK()
-                : new Response(ApiResponseCodes.UnsuccessfulSend);
+
+            if (!response.IsSuccess)
+                return new Response(ApiResponseCodes.UnsuccessfulSend);
+            
+            await _clientAttemptService.Track2FaResendAttempt(new TrackAttemptRequest
+            {
+                ClientId = clientId,
+                IsSuccess = false
+            });
+
+            return Contracts.Response.OK();
         }
         
         [HttpPost("verify")]
@@ -80,6 +89,12 @@ namespace Service.Verification.Api.Controllers
             };
             
             await _clientAttemptService.Track2FaAttempt(trackRequest);
+            
+            await _clientAttemptService.Track2FaResendAttempt(new TrackAttemptRequest
+            {
+                ClientId = clientId,
+                IsSuccess = true
+            });
 
             return response.CodeIsValid 
                 ? Contracts.Response.OK()
