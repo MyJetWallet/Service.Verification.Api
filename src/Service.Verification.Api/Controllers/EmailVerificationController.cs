@@ -1,11 +1,8 @@
-using System;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyJetWallet.Sdk.Authorization.Http;
-using MyJetWallet.Sdk.WalletApi.Contracts;
 using Service.Verification.Api.Controllers.Contracts;
 using Service.VerificationCodes.Grpc;
 using Service.VerificationCodes.Grpc.Models;
@@ -43,7 +40,8 @@ namespace Service.Verification.Api.Controllers
                 Lang = request.Language,
                 ClientId = clientId,
                 Brand = this.GetBrandId(),
-                DeviceType = request.DeviceType
+                DeviceType = request.DeviceType,
+                PlatformType = request.Platform.ToString()
             };
             var response = await _emailVerificationService.SendEmailVerificationCodeAsync(sendRequest);
             return response.IsSuccess 
