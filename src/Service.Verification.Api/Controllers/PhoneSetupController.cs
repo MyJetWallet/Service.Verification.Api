@@ -102,11 +102,18 @@ namespace Service.Verification.Api.Controllers
                 PhoneIso = request.PhoneIso,
             };
             var response = await _phoneSetupService.VerifyPhoneNumberAsync(verifyRequest);
-            return response.CodeIsValid
-                ? response.PhoneIsValid
-                    ? Contracts.Response.OK()
-                    : new Response(ApiResponseCodes.InvalidPhone)
-                : new Response(ApiResponseCodes.InvalidCode);
+
+            if (!response.PhoneIsValid)
+            {
+                return new Response(ApiResponseCodes.InvalidPhone);
+            }
+            
+            if (!response.CodeIsValid)
+            {
+                return new Response(ApiResponseCodes.InvalidCode);
+            }
+            
+            return !response.PhoneIsDuplicate ? new Response(ApiResponseCodes.PhoneDuplicate) : new Response(ApiResponseCodes.OK);
         }
 
         [HttpGet("get-number")]

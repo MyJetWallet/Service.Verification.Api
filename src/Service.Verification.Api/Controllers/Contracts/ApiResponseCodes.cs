@@ -14,5 +14,6 @@ namespace Service.Verification.Api.Controllers.Contracts
         PhoneNotFound = 6,
         InvalidPhone = 7,
         LanguageNotSet = 8,
+        PhoneDuplicate = 9,
     }
 }
