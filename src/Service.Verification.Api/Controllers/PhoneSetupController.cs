@@ -103,17 +103,17 @@ namespace Service.Verification.Api.Controllers
             };
             var response = await _phoneSetupService.VerifyPhoneNumberAsync(verifyRequest);
 
-            if (!response.PhoneIsValid)
-            {
-                return new Response(ApiResponseCodes.InvalidPhone);
-            }
-            
             if (!response.CodeIsValid)
             {
                 return new Response(ApiResponseCodes.InvalidCode);
             }
             
-            return !response.PhoneIsDuplicate ? new Response(ApiResponseCodes.PhoneDuplicate) : new Response(ApiResponseCodes.OK);
+            if (!response.PhoneIsValid)
+            {
+                return new Response(ApiResponseCodes.InvalidPhone);
+            }
+            
+            return response.PhoneIsDuplicate ? new Response(ApiResponseCodes.PhoneDuplicate) : new Response(ApiResponseCodes.OK);
         }
 
         [HttpGet("get-number")]
