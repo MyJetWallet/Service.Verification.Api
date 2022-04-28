@@ -22,9 +22,7 @@ namespace Service.Verification.Api.Modules
             VerificationCodes.Client.AutofacHelper.RegisterVerificationCodesClient(builder, Program.Settings.VerificationCodesGrpcUrl);
             
             builder.RegisterClientBlockerClient(Program.Settings.ClientBlockerGrpcClient);
-            
-            var noSqlClient = builder.CreateNoSqlClient(Program.ReloadedSettings(e => e.MyNoSqlReaderHostPort));
-            builder.RegisterClientProfileClients(noSqlClient, Program.Settings.ClientProfileGrpcServiceUrl);
+            builder.RegisterClientProfileClientWithoutCache(Program.Settings.ClientProfileGrpcServiceUrl);
             
             RegisterAuthServices(builder);
         }

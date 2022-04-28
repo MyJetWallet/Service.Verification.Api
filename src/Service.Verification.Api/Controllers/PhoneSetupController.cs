@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using DotNetCoreDecorators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +10,11 @@ using MyJetWallet.ApiSecurityManager.ApiKeys;
 using MyJetWallet.Sdk.Authorization.Extensions;
 using MyJetWallet.Sdk.Authorization.Http;
 using MyJetWallet.Sdk.WalletApi.Contracts;
+using Service.ClientBlocker.Grpc;
+using Service.ClientBlocker.Grpc.Models;
+using Service.ClientProfile.Domain.Models;
+using Service.ClientProfile.Grpc;
+using Service.ClientProfile.Grpc.Models.Requests;
 using Service.Verification.Api.Controllers.Contracts;
 using Service.Verification.Api.Validators;
 using Service.VerificationCodes.Grpc;
@@ -27,11 +34,16 @@ namespace Service.Verification.Api.Controllers
         private readonly IPhoneSetupService _phoneSetupService;
         private readonly IApiKeyStorage _apiKeyStorage;
 
+        private readonly IClientProfileService _clientProfile;
+        private readonly IClientAttemptService _attemptService;
+
         public PhoneSetupController(IPhoneSetupService phoneSetupService,
-            IApiKeyStorage apiKeyStorage)
+            IApiKeyStorage apiKeyStorage, IClientProfileService clientProfile, IClientAttemptService attemptService)
         {
             _phoneSetupService = phoneSetupService;
             _apiKeyStorage = apiKeyStorage;
+            _clientProfile = clientProfile;
+            _attemptService = attemptService;
         }
 
         [HttpPost("request")]
@@ -53,6 +65,20 @@ namespace Service.Verification.Api.Controllers
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
                 return Contracts.Response.OK();
             
+            var clientProfile = await _clientProfile.GetOrCreateProfile(new GetClientProfileRequest
+            {
+                ClientId = clientId
+            });
+            
+            var clientBlockers = clientProfile.Blockers?
+                .FirstOrDefault(itm =>
+                    itm.BlockedOperationType == BlockingType.PhoneNumberUpdate && DateTime.UtcNow < itm.ExpiryTime);
+
+            if (clientBlockers != null)
+            {
+                throw new WalletApiErrorBlockerException("Cant request verification, found blocker",
+                    MyJetWallet.Sdk.WalletApi.Contracts.ApiResponseCodes.OperationBlocked, clientBlockers.ExpiryTime - DateTime.UtcNow);
+            }
             
             var sendRequest = new SetupPhoneNumberRequest
             {
@@ -105,15 +131,40 @@ namespace Service.Verification.Api.Controllers
 
             if (!response.CodeIsValid)
             {
+                await _attemptService.TrackPhoneNumberAttempt(new TrackAttemptRequest
+                {
+                    ClientId = clientId,
+                    IsSuccess = false
+                });
                 return new Response(ApiResponseCodes.InvalidCode);
             }
             
             if (!response.PhoneIsValid)
             {
+                await _attemptService.TrackPhoneNumberAttempt(new TrackAttemptRequest
+                {
+                    ClientId = clientId,
+                    IsSuccess = false
+                });
                 return new Response(ApiResponseCodes.InvalidPhone);
             }
+
+            if (response.PhoneIsDuplicate)
+            {
+                await _attemptService.TrackPhoneNumberAttempt(new TrackAttemptRequest
+                {
+                    ClientId = clientId,
+                    IsSuccess = false
+                });
+                return new Response(ApiResponseCodes.PhoneDuplicate);
+            }
             
-            return response.PhoneIsDuplicate ? new Response(ApiResponseCodes.PhoneDuplicate) : new Response(ApiResponseCodes.OK);
+            await _attemptService.TrackPhoneNumberAttempt(new TrackAttemptRequest
+            {
+                ClientId = clientId,
+                IsSuccess = true
+            });
+            return new Response(ApiResponseCodes.OK);
         }
 
         [HttpGet("get-number")]
