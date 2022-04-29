@@ -34,5 +34,9 @@ namespace Service.Verification.Api.Settings
         
         [YamlProperty("VerificationApi.ClientBlockerGrpcClient")]
         public string ClientBlockerGrpcClient { get; set; }
+        
+        [YamlProperty("VerificationApi.EnableApiTrace")]
+        public bool EnableApiTrace { get; set; }
+
     }
 }

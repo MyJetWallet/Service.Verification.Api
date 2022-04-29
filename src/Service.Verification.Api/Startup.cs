@@ -33,50 +33,18 @@ namespace Service.Verification.Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                TokensManager.DebugMode = true;
-                RootSessionAuthHandler.IsDevelopmentEnvironment = true;
-            }
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseForwardedHeaders();
-
-            app.UseRouting();
-            app.UseStaticFiles();
-
-            app.UseMetricServer();
-
-            app.BindServicesTree(Assembly.GetExecutingAssembly());
-            app.BindIsAlive();
-
-            app.UseOpenApi();
-            app.UseSwaggerUi3();
-
-            app.UseMiddleware<ExceptionLogMiddleware>();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
+            StartupUtils.SetupWalletApplication(app, env, Program.Settings.EnableApiTrace, "api");
             app.UseEndpoints(endpoints =>
             {
                 //security
                 endpoints.RegisterGrpcServices();
                 endpoints.MapControllers();
-
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Api endpoint");
-                });
             });
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
+            builder.ConfigureJetWallet();
             builder.RegisterModule<SettingsModule>();
             builder.RegisterModule<ServiceModule>();
         }
