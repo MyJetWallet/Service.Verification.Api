@@ -15,7 +15,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
         <PackageReference Include="MyJetWallet.Sdk.GrpcMetrics" Version="2.0.4" />
         <PackageReference Include="MyJetWallet.Sdk.GrpcSchema" Version="1.0.6" />
-        <PackageReference Include="MyJetWallet.Sdk.Service" Version="2.1.7" />
+        <PackageReference Include="MyJetWallet.Sdk.Service" Version="2.2.2" />
         <PackageReference Include="MyJetWallet.Sdk.WalletApi" Version="3.0.9" />
         <PackageReference Include="MyJetWallet.Service.ClientBlocker.Client" Version="1.0.8" />
         <PackageReference Include="MyJetWallet.Service.ClientProfile.Client" Version="1.2.2" />
@@ -29,7 +29,7 @@
         <PackageReference Include="MySettingsReader" Version="1.2.2" />
         <PackageReference Include="NSwag.AspNetCore" Version="13.15.10" />
         <PackageReference Include="MyJetWallet.Domain" Version="1.2.1" />
-        <PackageReference Include="MyJetWallet.Sdk.NoSql" Version="2.1.6" />
+        <PackageReference Include="MyJetWallet.Sdk.NoSql" Version="2.2.2" />
     </ItemGroup>
 
     <ItemGroup>
