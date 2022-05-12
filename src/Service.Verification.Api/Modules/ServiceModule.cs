@@ -43,7 +43,7 @@ namespace Service.Verification.Api.Modules
 
         protected void RegisterAuthServices(ContainerBuilder builder)
         {
-            var authNoSql = builder.CreateNoSqlClient(Program.ReloadedSettings(e => e.AuthMyNoSqlReaderHostPort));
+            var authNoSql = builder.CreateNoSqlClient(Program.Settings.AuthMyNoSqlReaderHostPort, Program.LogFactory);
             builder.RegisterMyNoSqlReader<ShortRootSessionNoSqlEntity>(authNoSql, ShortRootSessionNoSqlEntity.TableName);
         }
     }
