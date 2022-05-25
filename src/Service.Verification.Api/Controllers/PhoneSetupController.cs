@@ -76,8 +76,7 @@ namespace Service.Verification.Api.Controllers
 
             if (clientBlockers != null)
             {
-                throw new WalletApiErrorBlockerException("Cant request verification, found blocker",
-                    MyJetWallet.Sdk.WalletApi.Contracts.ApiResponseCodes.OperationBlocked, clientBlockers.ExpiryTime - DateTime.UtcNow);
+                throw new WalletApiErrorBlockerException("Cant request verification, found blocker", clientBlockers.ExpiryTime - DateTime.UtcNow);
             }
             
             var sendRequest = new SetupPhoneNumberRequest
