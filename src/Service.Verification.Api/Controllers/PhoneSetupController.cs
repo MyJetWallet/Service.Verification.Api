@@ -65,10 +65,13 @@ namespace Service.Verification.Api.Controllers
             if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
                 return Contracts.Response.OK();
             
-            await _attemptService.TrackPhoneSetupAttempt(new TrackAttemptRequest
-            {
-                ClientId = clientId
-            });
+            if(clientId == "73024fbcbf9c43bfb9feb67b2f453f8e")
+                return new Response(ApiResponseCodes.OperationBlocked);
+ 
+            // await _attemptService.TrackPhoneSetupAttempt(new TrackAttemptRequest
+            // {
+            //     ClientId = clientId
+            // });
             
             var clientProfile = await _clientProfile.GetOrCreateProfile(new GetClientProfileRequest
             {
