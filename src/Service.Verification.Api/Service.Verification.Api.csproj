@@ -17,7 +17,7 @@
         <PackageReference Include="MyJetWallet.Sdk.GrpcSchema" Version="1.0.6" />
         <PackageReference Include="MyJetWallet.Sdk.Service" Version="2.2.4" />
         <PackageReference Include="MyJetWallet.Sdk.WalletApi" Version="3.0.21" />
-        <PackageReference Include="MyJetWallet.Service.ClientBlocker.Client" Version="1.1.0" />
+        <PackageReference Include="MyJetWallet.Service.ClientBlocker.Client" Version="1.1.1" />
         <PackageReference Include="MyJetWallet.Service.ClientProfile.Client" Version="1.2.4" />
         <PackageReference Include="MyJetWallet.Service.VerificationCodes.Client" Version="1.4.1" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
