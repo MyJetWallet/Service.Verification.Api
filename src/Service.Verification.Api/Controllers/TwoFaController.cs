@@ -63,7 +63,9 @@ namespace Service.Verification.Api.Controllers
             var (_, token) = _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
 
             var clientId = this.GetClientIdentity().ClientId;
-
+            if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
+                return new Response(ApiResponseCodes.InvalidCode);
+            
             var verifyRequest = new Verify2FaCodeRequest
             {
                 ClientId = clientId,
@@ -132,7 +134,11 @@ namespace Service.Verification.Api.Controllers
         {
             var tokenStr = this.GetSessionToken();
             var (_, token) = _apiKeyStorage.ParseToken(Program.Settings.SessionEncryptionApiKeyId, tokenStr);
-
+            
+            var clientId = this.GetClientIdentity().ClientId;
+            if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
+                return new Response(ApiResponseCodes.InvalidCode);
+            
             var verifyRequest = new Verify2FaChangeCodeRequest()
             {
                 ClientId = this.GetClientIdentity().ClientId,
@@ -149,6 +155,10 @@ namespace Service.Verification.Api.Controllers
         [HttpPost("verify-disable")]
         public async Task<Response> Verify2FaDisableAsync([FromBody] VerifyCodeRequest request)
         {
+            var clientId = this.GetClientIdentity().ClientId;
+            if (clientId == SpecialUserIds.EmptyUser.ToString("N"))
+                return new Response(ApiResponseCodes.InvalidCode);
+            
             var verifyRequest = new Verify2FaChangeCodeRequest()
             {
                 ClientId = this.GetClientIdentity().ClientId,
